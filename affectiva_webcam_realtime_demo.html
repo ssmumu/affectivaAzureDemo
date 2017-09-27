@@ -1,113 +1,223 @@
-<!--
-####Source Code from:
-https://jsfiddle.net/affectiva/h6p64vwg/show/
--->
 
-<!DOCTYPE HTML>
-
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta http-equiv="edit-Type" edit="text/html; charset=utf-8">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
 
+  
+  
+
+  
+  
+  
+
+  
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-3.1.0.js"></script>
+
+  
+
+  
+
+  
+
+  
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+
+  
     
-      <meta name="robots" content="index, follow">
-      <meta name="googlebot" content="index, follow">
-
-      <script type="text/javascript" src="/js/embed/highlight.pack.js?update_14_05_2017_1"></script>
-
-      <script type="text/javascript" src="/js/embed/embed.js?update_14_05_2017_1"></script>
-
-
-      
-        <link rel="stylesheet" type="text/css" href="/css/embed/embed-light.css?update_14_05_2017_1"/>
-
-      
-
-      <script type="text/javascript">
-        var height;
-        var force_height = null;
-        var slug = "opyh5e8d";
-        var show_src = "//fiddle.jshell.net/affectiva/opyh5e8d/show/light/";
-        var resize_element_counter = 0;
-        var shell_edit_url = '/affectiva/opyh5e8d/light/';
-
-        
-      </script>
+      <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     
+  
+    
+      <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    
+  
+    
+      <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    
+  
+    
+      <script type="text/javascript" src="https://download.affectiva.com/js/3.2/affdex.js"></script>
+    
+  
 
-    <link href="//fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
-    <!-- <link href="//fonts.googleapis.com/css?family=Lato:400|Inconsolata" rel="stylesheet" type="text/css"> -->
+  <style type="text/css">
+    
+  </style>
 
-    <style type="text/css" media="screen">
-      
-      
-      
-      
-    </style>
+  <title>Emotion from Camera Sample App by affectiva</title>
 
-  </head>
+  
+</head>
+
+<body>
   <body>
-    <div id="wrapper">
-      
-        <header>
-          <h1><a href="/affectiva/opyh5e8d/?utm_source=website&amp;utm_medium=embed&amp;utm_campaign=opyh5e8d" target="_blank">Edit in JSFiddle</a></h1>
-          <!-- <h1><a href="/affectiva/opyh5e8d/light/" target="_blank">Edit in JSFiddle</a></h1> -->
-          <div id="actions">
-            <ul class="normalRes">
-              
-                <li class="active">
-                  <a data-trigger-type="result" href="#Result">Result</a>
-                </li>
-              
-            </ul>
-            <div class="hl"></div>
-          </div>
-        </header>
-
-        <div id="tabs">
-          
-            <div class="tCont result active" id="result"></div>
-              
-                <script type="text/javascript">
-                  window.addEventListener('load', function(){
-                    if (typeof(EmbedManager) === undefined){
-                      
-                        EmbedManager.loadResult();
-                      
-                    }
-                  }, false);
-                </script>
-              
-            
-          
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-8" id="affdex_elements" style="width:680px;height:480px;"></div>
+      <div class="col-md-4">
+        <div style="height:25em;">
+          <strong>EMOTION TRACKING RESULTS</strong>
+          <div id="results" style="word-wrap:break-word;"></div>
         </div>
-      
+        <div>
+          <strong>DETECTOR LOG MSGS</strong>
+        </div>
+        <div id="logs"></div>
+      </div>
     </div>
+    <div>
+      <button id="start" onclick="onStart()">Start</button>
+      <button id="stop" onclick="onStop()">Stop</button>
+      <button id="reset" onclick="onReset()">Reset</button>
+      <h3>Affectiva JS SDK CameraDetector to track different emotions.</h3>
+      <p>
+        <strong>Instructions</strong>
+        </br>
+        Press the start button to start the detector.
+        <br/> When a face is detected, the probabilities of the different emotions are written to the DOM.
+        <br/> Press the stop button to end the detector.
+      </p>
+    </div>
+  </div>
+</body>
 
-    
-      <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
 
-  var GA_LOCAL_STORAGE_KEY = 'ga:clientId';
-  if (window.localStorage) {
-    ga('create', 'UA-366077-19', {
-      'storage': 'none',
-      'clientId': localStorage.getItem(GA_LOCAL_STORAGE_KEY)
-    });
-    ga(function(tracker) {
-      localStorage.setItem(GA_LOCAL_STORAGE_KEY, tracker.get('clientId'));
-    });
-    ga('send', 'pageview', '/[user]/[fiddle]/embedded/[tabs]/'); // where `url_structure` is for example `/[user]/[fiddle]/[revision]/embedded/js,css/`
+
+
+
+<script type='text/javascript'>//<![CDATA[
+
+      // SDK Needs to create video and canvas nodes in the DOM in order to function
+      // Here we are adding those nodes a predefined div.
+      var divRoot = $("#affdex_elements")[0];
+      var width = 640;
+      var height = 480;
+      var faceMode = affdex.FaceDetectorMode.LARGE_FACES;
+      //Construct a CameraDetector and specify the image width / height and face detector mode.
+      var detector = new affdex.CameraDetector(divRoot, width, height, faceMode);
+
+      //Enable detection of all Expressions, Emotions and Emojis classifiers.
+      detector.detectAllEmotions();
+      detector.detectAllExpressions();
+      detector.detectAllEmojis();
+      detector.detectAllAppearance();
+
+      //Add a callback to notify when the detector is initialized and ready for runing.
+      detector.addEventListener("onInitializeSuccess", function() {
+        log('#logs', "The detector reports initialized");
+        //Display canvas instead of video feed because we want to draw the feature points on it
+        $("#face_video_canvas").css("display", "block");
+        $("#face_video").css("display", "none");
+      });
+
+      function log(node_name, msg) {
+        $(node_name).append("<span>" + msg + "</span><br />")
+      }
+
+      //function executes when Start button is pushed.
+      function onStart() {
+        if (detector && !detector.isRunning) {
+          $("#logs").html("");
+          detector.start();
+        }
+        log('#logs', "Clicked the start button");
+      }
+
+      //function executes when the Stop button is pushed.
+      function onStop() {
+        log('#logs', "Clicked the stop button");
+        if (detector && detector.isRunning) {
+          detector.removeEventListener();
+          detector.stop();
+        }
+      };
+
+      //function executes when the Reset button is pushed.
+      function onReset() {
+        log('#logs', "Clicked the reset button");
+        if (detector && detector.isRunning) {
+          detector.reset();
+
+          $('#results').html("");
+        }
+      };
+
+      //Add a callback to notify when camera access is allowed
+      detector.addEventListener("onWebcamConnectSuccess", function() {
+        log('#logs', "Webcam access allowed");
+      });
+
+      //Add a callback to notify when camera access is denied
+      detector.addEventListener("onWebcamConnectFailure", function() {
+        log('#logs', "webcam denied");
+        console.log("Webcam access denied");
+      });
+
+      //Add a callback to notify when detector is stopped
+      detector.addEventListener("onStopSuccess", function() {
+        log('#logs', "The detector reports stopped");
+        $("#results").html("");
+      });
+
+      //Add a callback to receive the results from processing an image.
+      //The faces object contains the list of the faces detected in an image.
+      //Faces object contains probabilities for all the different expressions, emotions and appearance metrics
+      detector.addEventListener("onImageResultsSuccess", function(faces, image, timestamp) {
+        $('#results').html("");
+        log('#results', "Timestamp: " + timestamp.toFixed(2));
+        log('#results', "Number of faces found: " + faces.length);
+        if (faces.length > 0) {
+          log('#results', "Appearance: " + JSON.stringify(faces[0].appearance));
+          log('#results', "Emotions: " + JSON.stringify(faces[0].emotions, function(key, val) {
+            return val.toFixed ? Number(val.toFixed(0)) : val;
+          }));
+          log('#results', "Expressions: " + JSON.stringify(faces[0].expressions, function(key, val) {
+            return val.toFixed ? Number(val.toFixed(0)) : val;
+          }));
+          log('#results', "Emoji: " + faces[0].emojis.dominantEmoji);
+          drawFeaturePoints(image, faces[0].featurePoints);
+        }
+      });
+
+      //Draw the detected facial feature points on the image
+      function drawFeaturePoints(img, featurePoints) {
+        var contxt = $('#face_video_canvas')[0].getContext('2d');
+
+        var hRatio = contxt.canvas.width / img.width;
+        var vRatio = contxt.canvas.height / img.height;
+        var ratio = Math.min(hRatio, vRatio);
+
+        contxt.strokeStyle = "#FFFFFF";
+        for (var id in featurePoints) {
+          contxt.beginPath();
+          contxt.arc(featurePoints[id].x,
+            featurePoints[id].y, 2, 0, 2 * Math.PI);
+          contxt.stroke();
+
+        }
+      }
+
+//]]> 
+
+</script>
+
+  <script>
+  // tell the embed parent frame the height of the content
+  if (window.parent && window.parent.parent){
+    window.parent.parent.postMessage(["resultsFrame", {
+      height: document.body.getBoundingClientRect().height,
+      slug: "opyh5e8d"
+    }], "*")
   }
 </script>
 
-      
-    
+</body>
 
-  </body>
 </html>
+
