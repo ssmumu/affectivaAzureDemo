@@ -4,7 +4,6 @@ import re
 import pandas as pd
 
 RMP_URL_BASE = 'http://www.ratemyprofessors.com'
-CSE_URL_BASE = 'http://www.eecs.umich.edu/'
 CSE_FAC_URL = 'http://www.eecs.umich.edu/eecs/faculty/csefaculty.html'
 
 
@@ -28,9 +27,9 @@ def rmp_scrape():
 				diff_ratings.append(float((inner_soup.find(class_='difficulty').find(class_='grade').contents[0])))
 
 	rmp_dict = {
-		'names': [child.find(class_='name').contents[0].strip() for child in children],
-		'ratings': [float(child.find(class_='rating').contents[0].strip()) for child in children],
-		'diff_ratings': diff_ratings
+		'name': [child.find(class_='name').contents[0].strip() for child in children],
+		'rating': [float(child.find(class_='rating').contents[0].strip()) for child in children],
+		'diff_rating': diff_ratings
 	}
 	return pd.DataFrame(rmp_dict)
 
@@ -48,14 +47,14 @@ def cse_scrape():
 	for item in soup.find_all('tr'):
 		if (item.find('img')):
 			# Get rid of middle name if exists (keep '<last_name>, <first_name>' only)
-			cse_fac_names.append(re.search('[A-z]+\, [A-z]+', item.find('span').contents[0]).group(0))
+			cse_fac_names.append(re.findall('[A-z]+\, [A-z]+', item.find('span').contents[0])[0])
 
 			# Grab the source URL of image on server
-			cse_fac_imgs.append(item.find('img')['src'])
+			cse_fac_imgs.append(re.search('[A-z]+\.jpg', item.find('img')['src']).group(0))
 
 	cse_fac_dict = {
-		'names': cse_fac_names,
-		'imgs': cse_fac_imgs
+		'name': cse_fac_names,
+		'img_url': cse_fac_imgs
 	}
 	return pd.DataFrame(cse_fac_dict)
 
@@ -63,7 +62,8 @@ def cse_scrape():
 def main():
 	rmp_df = rmp_scrape()
 	cse_fac_df = cse_scrape()
-	print(cse_fac_df.merge(rmp_df, left_on='names', right_on='names', how='inner'))
+	merged_df = cse_fac_df.merge(rmp_df, left_on='name', right_on='name', how='inner')
+	merged_df[['name', 'rating', 'diff_rating', 'img_url']].to_json('merged_df.json')
 
 
 if __name__ == '__main__':

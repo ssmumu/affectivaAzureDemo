@@ -1,23 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <script type="text/javascript" src="//code.jquery.com/jquery-3.1.0.slim.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
-      <script type="text/javascript" src="https://download.affectiva.com/js/3.2/affdex.js"></script>
-  <style type="text/css">
-  </style>
-  <title>RMP Demo</title>
-</head>
-
-<body>
-  <div class="container">
-    <h2>RateMyProfessors Demo</h2>
-    <h5>Is there a relationship between emotions in UMich CSE department photos and RMP ratings?</h5>
-  </div>
-</body>
-
-<script type='text/javascript'>//<![CDATA[
+var CSE_URL_BASE = 'http://www.eecs.umich.edu/eecs/images/people/photos/';
 
 //Construct a PhotoDetector
 var detector = new affdex.PhotoDetector();
@@ -30,8 +11,6 @@ detector.detectAllAppearance();
 
 //Add a callback to notify when the detector is initialized and ready for runing.
 detector.addEventListener("onInitializeSuccess", function() {
-  log('#logs', "The detector reports initialized");
-
   $("#upload_button").css("visibility", "visible");
 });
 
@@ -40,29 +19,23 @@ detector.addEventListener("onInitializeSuccess", function() {
 //Faces object contains probabilities for all the different expressions, emotions and appearance metrics
 detector.addEventListener("onImageResultsSuccess", function(faces, image, timestamp) {
   drawImage(image);
-  $('#results').html("");
-  log('#results', "Timestamp: " + timestamp.toFixed(2));
-  log('#results', "Number of faces found: " + faces.length);
+  $('#results2').html("");
+  log('#results2', "Timestamp: " + timestamp.toFixed(2));
+  log('#results2', "Number of faces found: " + faces.length);
   if (faces.length > 0) {
-    log('#results', "Appearance: " + JSON.stringify(faces[0].appearance));
-    log('#results', "Emotions: " + JSON.stringify(faces[0].emotions, function(key, val) {
+    log('#results2', "Appearance: " + JSON.stringify(faces[0].appearance));
+    log('#results2', "Emotions: " + JSON.stringify(faces[0].emotions, function(key, val) {
       return val.toFixed ? Number(val.toFixed(0)) : val;
     }));
-    log('#results', "Expressions: " + JSON.stringify(faces[0].expressions, function(key, val) {
+    log('#results2', "Expressions: " + JSON.stringify(faces[0].expressions, function(key, val) {
       return val.toFixed ? Number(val.toFixed(0)) : val;
     }));
-    log('#results', "Emoji: " + faces[0].emojis.dominantEmoji);
+    log('#results2', "Emoji: " + faces[0].emojis.dominantEmoji);
     drawFeaturePoints(image, faces[0].featurePoints);
   }
 });
 
-//Add a callback to notify if failed receive the results from processing an image.
-detector.addEventListener("onImageResultsFailure", function(image, timestamp, error) {
-  log('#logs', 'Failed to process image err=' + error);
-});
-
 //Initialize the emotion detector
-log("#logs", "Starting the detector .. please wait");
 detector.start();
 
 
@@ -92,9 +65,10 @@ function loadFile(event) {
   reader.readAsDataURL(event.target.files[0]);
 };
 
+
 //Convienence function for logging to the DOM
-function log(node_name, msg) {
-  $(node_name).append("<span>" + msg + "</span><br />")
+function log(node, msg) {
+  $(node).append("<span>" + msg + "</span><br />")
 }
 
 //Draw Image to container
@@ -142,20 +116,23 @@ function drawFeaturePoints(img, featurePoints) {
   }
 }
 
-</script>
-
-  <script>
-  // tell the embed parent frame the height of the content
-  if (window.parent && window.parent.parent){
-    window.parent.parent.postMessage(["resultsFrame", {
-      height: document.body.getBoundingClientRect().height,
-      slug: "h6p64vwg"
-    }], "*")
-  }
-</script>
-
-</body>
-
-</html>
-
-
+function readJSON() {
+  $.getJSON('merged_df.json', function(data) {
+    $.each(['Name', 'Rating', 'Difficulty', 'Image'], function(k, label) {
+      $('#results').append($('<th>').text(label))
+    });
+    for (var i = 0; i < Object.keys(data['name']).length; i++) {
+      var $tr = $('<tr>');
+      $.each(Object.keys(data), function(j, label) {
+        if (j < 3) {
+          $tr.append($('<td>').text(data[label][i]));
+        }
+        else {
+          var imageURL = CSE_URL_BASE + data[label][i];
+          $tr.append($('<td>').append('<img src=' + imageURL + '>'))
+        }
+      });
+      $('#results').append($tr);
+    }
+  });
+}
