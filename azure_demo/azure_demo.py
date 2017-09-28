@@ -22,9 +22,9 @@ PARAMS = urllib.parse.urlencode({})
 # Examples for happiness, anger, and fear.
 EXAMPLES = [
     "http://cdn3-www.dogtime.com/assets/uploads/gallery/goldador-dog-breed-pictures/puppy-1.jpg",
+    "http://www.papajohns.com/a/img/content/pizza-family-img.jpg",
     "https://i.ytimg.com/vi/KTCQpjUrCe8/maxresdefault.jpg",
-    "http://krnb.com/kj-midday/wp-content/uploads/sites/2/2014/03/sad-baby.jpg",
-    "http://www.papajohns.com/a/img/content/pizza-family-img.jpg"
+    "http://krnb.com/kj-midday/wp-content/uploads/sites/2/2014/03/sad-baby.jpg"
 ]
 
 
@@ -44,6 +44,17 @@ def get_facedata(url_image):
     facedata = json.loads(con.getresponse().read().decode("utf-8"))
     con.close()
     return facedata
+
+
+def get_emotions(face):
+    """
+    Args:
+    (dict) face -- Azure data for a single face.
+
+    Returns:
+    (list: tuple) Emotions ordered by score.
+    """
+    return sorted(face["scores"].items(), key=operator.itemgetter(1), reverse=True)
 
 
 def get_image(url_image):
@@ -80,7 +91,7 @@ def apply_facedata_to_image(image, facedata):
         cv2.putText(
             image, emotion, 
             (rectangle["left"], rectangle["top"]-10),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 1)
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
 
 def show_image(image):
