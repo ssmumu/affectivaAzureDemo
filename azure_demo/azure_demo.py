@@ -100,8 +100,8 @@ def get_sorted_emotions(single_face):
     return sorted(single_face["scores"].items(), key=operator.itemgetter(1), reverse=True)
 
 
-def split_videos_into_frames(video_path, framedir, frames):
-    print("capturing " + str(frames) + " frames...")
+def split_videos_into_frames(video_path, framedir, max_frames):
+    print("capturing " + str(max_frames) + " frames...")
     if not os.path.exists(framedir):
         os.makedirs(framedir)
     cap = cv2.VideoCapture(video_path)
@@ -116,7 +116,7 @@ def split_videos_into_frames(video_path, framedir, frames):
             filename = framedir + "/frame_" + str(framecnt) + ".jpg"
             cv2.imwrite(filename, frame)
             framecnt += 1
-            if framecnt == 10:
+            if framecnt == max_frames:
                 break
 
 
