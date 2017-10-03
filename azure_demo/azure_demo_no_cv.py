@@ -1,54 +1,64 @@
-import sys
-import json
+import time
 import requests
 import operator
-import http.client
-import urllib.parse
-import urllib.request
-import urllib.error
-import base64
 
-# Replace "OCP-Apim-Subscription-Key" with your API key.
-HEADERS = {
-    "Content-Type": "application/json",
-    "Ocp-Apim-Subscription-Key": "edd4bbdd82bf459dac9fb5ecb60a6a37"
-}
-
-PARAMS = urllib.parse.urlencode({})
-
-# Examples for happiness, anger, and fear.
-EXAMPLES = [
-    "http://cdn3-www.dogtime.com/assets/uploads/gallery/goldador-dog-breed-pictures/puppy-1.jpg",
-    "http://www.papajohns.com/a/img/content/pizza-family-img.jpg",
-    "https://i.ytimg.com/vi/KTCQpjUrCe8/maxresdefault.jpg",
-    "http://krnb.com/kj-midday/wp-content/uploads/sites/2/2014/03/sad-baby.jpg"
-]
+_url = "https://api.projectoxford.ai/emotion/v1.0/recognize"
+_key = "edd4bbdd82bf459dac9fb5ecb60a6a37"
+_maxNumRetries = 10
 
 
-def get_facedata(url_image):
-    """
-    Args:
-    (str) url_image -- URL string to an image.
+def process_request(json, data, headers, params):
+    retries = 0
+    result = None
+    while True:
+        response = requests.request("post", _url, json=json, data=data,
+            headers=headers, params=params)
+        if response.status_code == 429:
+            print("Message: %s" % (response.json()["error"]["message"]))
+            if retries <= _maxNumRetries:
+                time.sleep(1)
+                retries += 1
+                continue
+            else:
+                print("Error: Failed after retrying!")
+                break
+        elif response.status_code == 200 or response.status_code == 201:
+            if ("content-length" in response.headers
+                    and int(response.headers["content-length"]) == 0):
+                result = None
+            elif ("content-type" in response.headers
+                    and isinstance(response.headers["content-type"], str)):
+                if ("application/json" in response.headers["content-type"].lower()):
+                    result = response.json() if response.content else None
+                elif "image" in response.headers["content-type"].lower():
+                    result = response.content
+        else:
+            print("Error code: %d" % (response.status_code))
+            print("Message: %s" % (response.json()["error"]["message"]))
+        break
+    return result
 
-    Returns:
-    (list: dict) Each element contains data for a single face in the
-    image. Azure provides data for the position of the identified
-    face and emotion scores.
-    """
-    con = http.client.HTTPSConnection("westus.api.cognitive.microsoft.com")
-    con.request("POST", "/emotion/v1.0/recognize?%s"
-        % PARAMS, "{'url': '%s'}" % url_image, HEADERS)
-    facedata = json.loads(con.getresponse().read().decode("utf-8"))
-    con.close()
-    return facedata
+
+def analyze_web_image(image_url):
+    headers = {
+        "Ocp-Apim-Subscription-Key": _key,
+        "Content-Type": "application/json"
+    }
+    json = {"url": image_url}
+    result = process_request(json, None, headers, None)
+    return result
 
 
-def get_emotions(face):
-    """
-    Args:
-    (dict) face -- Azure data for a single face.
+def analyze_disk_image(image_path):
+    headers = {
+        "Ocp-Apim-Subscription-Key": _key,
+        "Content-Type": "application/octet-stream"
+    }
+    with open(image_path, "rb") as f:
+        data = f.read()
+    result = process_request(None, data, headers, None)
+    return result
 
-    Returns:
-    (list: tuple) Emotions ordered by score.
-    """
-    return sorted(face["scores"].items(), key=operator.itemgetter(1), reverse=True)
+
+def get_sorted_emotions(single_face):
+    return sorted(single_face["scores"].items(), key=operator.itemgetter(1), reverse=True)
